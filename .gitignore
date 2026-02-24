@@ -1,0 +1,14 @@
+# Environment file
+.env
+
+# Build files
+*.exe
+*.out
+*.test
+
+# Go workspace
+vendor/
+
+# IDE files
+.vscode/
+.idea/
