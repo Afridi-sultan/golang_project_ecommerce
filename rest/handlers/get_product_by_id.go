@@ -17,9 +17,12 @@ func GetProductByid(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	for _,product := range database.ProductList{
-		if product.ID == pID{
-			util.SendData(w,product,200)
-		}
-	}
+	product := database.Get(pID)
+	util.SendData(w,product,200)
+
+	// for _,product := range database.ProductList{
+	// 	if product.ID == pID{
+	// 		util.SendData(w,product,200)
+	// 	}
+	// }
 }
