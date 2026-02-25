@@ -13,16 +13,46 @@ type Products struct {
 // product slice
 var ProductList []Products
 
+// get all product 
 
-//get product 
+func GetAllProduct()[] Products{
+	return ProductList
+}
 
+
+//get product by id
 func Get(id int)*Products{
-	for _,product := range ProductList{
-		if id == product.ID{
-			return &product
+	for i := range ProductList{
+		if id == ProductList[i].ID{
+			return &ProductList[i]
 		}
 	}
 	return nil
+}
+
+// update product 
+func Update(id int, data Products)*Products{
+	for idx := range ProductList{
+		if id == ProductList[idx].ID{
+			ProductList[idx] =  data
+			return &ProductList[idx]
+		}
+	}
+	return nil
+}
+//delete product 
+func Delete(id int)bool{
+	var newList []Products
+	found := false
+	for i := range ProductList{
+		if id != ProductList[i].ID{
+			newList = append(newList, ProductList[i])
+			found = true
+			continue
+		}
+	}
+	ProductList =  newList
+	return found
 }
 
 // init function

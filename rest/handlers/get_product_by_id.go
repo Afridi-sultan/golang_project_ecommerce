@@ -18,11 +18,13 @@ func GetProductByid(w http.ResponseWriter, r *http.Request){
 	}
 
 	product := database.Get(pID)
+	if product == nil{
+		http.Error(w,"Product not found",404)
+		return
+	}
 	util.SendData(w,product,200)
 
-	// for _,product := range database.ProductList{
-	// 	if product.ID == pID{
-	// 		util.SendData(w,product,200)
-	// 	}
-	// }
+	
 }
+
+
