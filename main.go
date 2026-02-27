@@ -1,8 +1,12 @@
 package main
 
-import "eccomerce/cmd"
+import (
+	"eccomerce/cmd"
+	
+)
 
 func main() {
 	//server start from here
 	cmd.Serve()
+	
 }
