@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +23,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	
 	newUser.Store()
-
+	
 	//encode new data with status code
 	util.SendData(w, newUser, 201)
 
