@@ -1,0 +1,74 @@
+// test middleware
+package middleware
+
+import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"log"
+	"net/http"
+	"os"
+	"strings"
+
+	"github.com/joho/godotenv"
+)
+
+func AuthenticateJwt(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//jwt verify
+		header := r.Header.Get("Authorization")
+		if header == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		headerArr := strings.Split(header, " ")
+		if len(headerArr) != 2 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		accessToken := headerArr[1]
+
+		tokenParts := strings.Split(accessToken, ".")
+		if len(tokenParts) != 3 {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		jwtHeader := tokenParts[0]
+		jwtPayload := tokenParts[1]
+		signature := tokenParts[2]
+
+		message := jwtHeader + "." + jwtPayload
+
+		//load env
+		error := godotenv.Load()
+		if error != nil {
+			log.Fatal("Error loading .env file")
+		}
+
+		jwtSecKey := os.Getenv("SECRET_KEY")
+
+		bytearrJwtSec := []byte(jwtSecKey)
+		byteArrMessage := []byte(message)
+
+		//HMAC
+		h := hmac.New(sha256.New, bytearrJwtSec)
+		h.Write(byteArrMessage)
+
+		//signature
+		hash := h.Sum(nil)
+		newSignature := base64UrlEncode(hash)
+
+		if newSignature != signature {
+			http.Error(w, "unauthorized, Hacker found", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+// base64 convertion function
+func base64UrlEncode(data []byte) string {
+	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(data)
+}

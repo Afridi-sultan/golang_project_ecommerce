@@ -3,11 +3,11 @@ package database
 // custom struct
 
 type Products struct {
-	ID          int
-	Title       string
-	Description string
-	Price       float64
-	ImgUrl      string
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	ImgUrl      string  `json:"imgUrl"`
 }
 
 // product slice

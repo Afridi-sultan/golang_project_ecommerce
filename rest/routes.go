@@ -14,10 +14,27 @@ func InitRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 		),
 	)
 
-	mux.Handle("POST /create-products", http.HandlerFunc(handlers.CreateProduct))
+	mux.Handle(
+		"POST /create-products",
+		manager.With(middleware.AuthenticateJwt)(
+			http.HandlerFunc(handlers.CreateProduct),
+		),
+	)
+
+	mux.Handle(
+		"PUT /products/{id}", 
+		manager.With(middleware.AuthenticateJwt)(
+			http.HandlerFunc(handlers.UpdateProductByid),
+		),
+	)
+
+	mux.Handle("DELETE /products/{id}", 
+	manager.With(middleware.AuthenticateJwt)(
+		http.HandlerFunc(handlers.DelProductByid),
+	),
+	)
+
 	mux.Handle("GET /products/{id}", http.HandlerFunc(handlers.GetProductByid))
-	mux.Handle("PUT /products/{id}", http.HandlerFunc(handlers.UpdateProductByid))
-	mux.Handle("DELETE /products/{id}", http.HandlerFunc(handlers.DelProductByid))
 	mux.Handle("POST /users", http.HandlerFunc(handlers.CreateUser))
 	mux.Handle("POST /users/login", http.HandlerFunc(handlers.LoginUser))
 }
