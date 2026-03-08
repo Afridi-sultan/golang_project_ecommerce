@@ -1,4 +1,4 @@
-package handlers
+package product
 
 import (
 	"eccomerce/database"
@@ -9,10 +9,12 @@ import (
 )
 
 // create product route
-func CreateProduct(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
+
 	var newProduct database.Products
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newProduct)
+
 
 	if err != nil {
 		fmt.Println(err)

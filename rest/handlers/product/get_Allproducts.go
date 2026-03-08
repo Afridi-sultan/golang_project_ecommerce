@@ -1,4 +1,4 @@
-package handlers
+package product
 
 import (
 	"eccomerce/database"
@@ -7,7 +7,7 @@ import (
 )
 
 // route function | product route
-func ProductHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	util.SendData(w, database.ProductList, 200)
 
 }

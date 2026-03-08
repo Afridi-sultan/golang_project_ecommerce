@@ -1,8 +1,14 @@
 package cmd
 
-import "eccomerce/rest"
+import (
+	"eccomerce/rest"
+	"eccomerce/rest/handlers/product"
+	"eccomerce/rest/handlers/user"
+)
 
 func Serve() {
-	
-	rest.Start()
+	productHandler := product.NewHandler()
+	userHandler := user.NewHandler()
+	server := rest.NewServer(productHandler, userHandler)
+	server.Start()
 }

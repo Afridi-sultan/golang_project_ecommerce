@@ -1,4 +1,4 @@
-package handlers
+package user
 
 import (
 	"eccomerce/database"
@@ -18,7 +18,7 @@ type ReqLogin struct {
 }
 
 // create product route
-func LoginUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	var loginUser ReqLogin
 	decoder := json.NewDecoder(r.Body)
