@@ -26,6 +26,6 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	database.ProductList = append(database.ProductList, newProduct)
 
 	//encode new data with status code
-	util.SendData(w, newProduct, 201)
+	util.SendData(w, &newProduct, 201)
 
 }

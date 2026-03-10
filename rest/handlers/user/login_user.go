@@ -1,15 +1,12 @@
 package user
 
 import (
+	"eccomerce/config"
 	"eccomerce/database"
 	"eccomerce/util"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
 )
 
 type ReqLogin struct {
@@ -36,23 +33,17 @@ func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//load env
-	error := godotenv.Load()
-	if error != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	jwtSecKey := os.Getenv("SECRET_KEY")
+	jwtSecKey := config.SecretKey
 
 	accessToken, e := util.CreateJwt(jwtSecKey, util.Payloader{
-		Sub: usr.ID,
-		FirstName: usr.FirstName,
-		Email: usr.Email,
+		Sub:         usr.ID,
+		FirstName:   usr.FirstName,
+		Email:       usr.Email,
 		IsShopOwner: usr.IsShopOwner,
 	})
 
-	if e != nil{
-		http.Error(w, "internel server error",401)
+	if e != nil {
+		http.Error(w, "internel server error", 401)
 		return
 	}
 

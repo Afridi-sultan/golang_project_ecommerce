@@ -4,6 +4,7 @@ import (
 	"eccomerce/rest"
 	"eccomerce/rest/handlers/product"
 	"eccomerce/rest/handlers/user"
+
 )
 
 func Serve() {
@@ -11,4 +12,5 @@ func Serve() {
 	userHandler := user.NewHandler()
 	server := rest.NewServer(productHandler, userHandler)
 	server.Start()
+
 }

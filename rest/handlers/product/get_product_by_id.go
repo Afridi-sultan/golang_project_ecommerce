@@ -23,6 +23,7 @@ func (h *Handler) GetProductByid(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	util.SendData(w,product,200)
+	
 
 	
 }
