@@ -2,7 +2,6 @@ package user
 
 import (
 	"eccomerce/config"
-	"eccomerce/database"
 	"eccomerce/util"
 	"encoding/json"
 	"fmt"
@@ -27,11 +26,7 @@ func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usr := database.FindUser(loginUser.Email, loginUser.Password)
-	if usr == nil {
-		http.Error(w, "invalid credentials", 400)
-		return
-	}
+	usr, err := h.userRepo.Get(loginUser.Email,loginUser.Password)
 
 	jwtSecKey := config.SecretKey
 

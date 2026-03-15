@@ -1,24 +1,24 @@
 package product
 
 import (
-	"eccomerce/database"
+
+	"eccomerce/repo"
 	"eccomerce/util"
 	"encoding/json"
 	"net/http"
-	"strconv"
+	// "strconv"
 )
-
+type Rproducts struct {
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	ImgUrl      string  `json:"imgUrl"`
+}
 func (h *Handler) UpdateProductByid(w http.ResponseWriter, r *http.Request) {
-	ProductId := r.PathValue("id")
+	
 
-	pID, err := strconv.Atoi(ProductId)
-
-	if err != nil {
-		http.Error(w, "Please put valid product id!", 400)
-		return
-	}
-
-	var updateProduct database.Products
+	var updateProduct Rproducts
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -28,10 +28,18 @@ func (h *Handler) UpdateProductByid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updated := database.Update(pID, updateProduct)
-	if updated == nil {
-		http.Error(w, "product not found", 404)
+	updated, err := h.productRepo.Update(repo.Products{
+		ID: updateProduct.ID,
+		Title:updateProduct.Title ,
+		Description: updateProduct.Description,
+		ImgUrl: updateProduct.ImgUrl,
+		Price: updateProduct.Price,
+	})
+
+	if err !=nil{
+		http.Error(w,"Internel server error",http.StatusBadRequest)
 	}
-	util.SendData(w, updateProduct, 200)
+	
+	util.SendData(w, &updated, http.StatusOK)
 
 }

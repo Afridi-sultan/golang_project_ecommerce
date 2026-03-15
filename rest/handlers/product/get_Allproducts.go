@@ -1,13 +1,18 @@
 package product
 
 import (
-	"eccomerce/database"
+	
 	"eccomerce/util"
 	"net/http"
 )
 
 // route function | product route
 func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
-	util.SendData(w, database.ProductList, 200)
+	productList,err := h.productRepo.List()
+	if err != nil{
+		http.Error(w,"Internel Server Error",http.StatusBadRequest)
+		return
+	}
+	util.SendData(w, &productList, http.StatusOK)
 
 }

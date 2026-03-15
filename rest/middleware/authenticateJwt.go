@@ -4,13 +4,12 @@ package middleware
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"eccomerce/config"
 	"encoding/base64"
-	"log"
 	"net/http"
-	"os"
 	"strings"
 
-	"github.com/joho/godotenv"
+	
 )
 
 func AuthenticateJwt(next http.Handler) http.Handler {
@@ -41,12 +40,9 @@ func AuthenticateJwt(next http.Handler) http.Handler {
 		message := jwtHeader + "." + jwtPayload
 
 		//load env
-		error := godotenv.Load()
-		if error != nil {
-			log.Fatal("Error loading .env file")
-		}
+		
 
-		jwtSecKey := os.Getenv("SECRET_KEY")
+		jwtSecKey := config.SecretKey
 
 		bytearrJwtSec := []byte(jwtSecKey)
 		byteArrMessage := []byte(message)

@@ -1,17 +1,23 @@
 package product
 
 import (
-	"eccomerce/database"
+	
+	"eccomerce/repo"
 	"eccomerce/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
-
+type ReqProducts struct {
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	ImgUrl      string  `json:"imgUrl"`
+}
 // create product route
 func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
-	var newProduct database.Products
+	var newProduct ReqProducts
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&newProduct)
 
@@ -22,10 +28,20 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newProduct.ID = len(database.ProductList) + 1
-	database.ProductList = append(database.ProductList, newProduct)
+	createProduct, err := h.productRepo.Create(repo.Products{
+		Title: newProduct.Title,
+		Description: newProduct.Description,
+		ImgUrl: newProduct.ImgUrl,
+		Price: newProduct.Price,
+	})
+
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Internel Server Error", http.StatusBadRequest)
+		return
+	}
 
 	//encode new data with status code
-	util.SendData(w, &newProduct, 201)
+	util.SendData(w, createProduct, 201)
 
 }
