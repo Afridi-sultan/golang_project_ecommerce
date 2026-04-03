@@ -26,7 +26,7 @@ func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usr, err := h.userRepo.Get(loginUser.Email,loginUser.Password)
+	usr, err := h.userRepo.GetUser(loginUser.Email,loginUser.Password)
 
 	jwtSecKey := config.SecretKey
 

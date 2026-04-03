@@ -1,66 +1,113 @@
 package repo
 
-type User struct{
-	ID int `json:"id"`
-	FirstName string `json:"first_name"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-	IsShopOwner bool `json:"is_shop_owner"`
+import (
+	"database/sql"
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+)
+
+type User struct {
+	ID          int    `json:"id" db:"id"`
+	FirstName   string `json:"first_name" db:"first_name"`
+	Email       string `json:"email" db:"email"`
+	Password    string `json:"password" db:"password"`
+	IsShopOwner bool   `json:"is_shop_owner" db:"is_shop_owner"`
 }
 
-type UserInterface interface{
-	Create(usr *User)(*User,error)
-	Get(email,pass string)(*User, error)
-	List()([]*User,error)
-	Delete(id int) error
-	Update(usr User)(*User, error)
+type UserInterface interface {
+	Create(usr *User) (*User, error)
+	GetUser(email, pass string) (*User, error)
+	// List() ([]*User, error)
+	// Delete(id int) error
+	// Update(usr User) (*User, error)
 }
 
-type userListSruct struct{
-	userList []*User
+type userListSruct struct {
+	db *sqlx.DB
 }
 
-//constructor 
-func NewUserList()UserInterface{
-	return &userListSruct{}
-}
-
-func (u *userListSruct) Create(usr *User)(*User,error){
-	usr.ID = len(u.userList)+1
-	u.userList = append(u.userList, usr)
-	return usr,nil
-}
-
-func (u *userListSruct)Get(email,pass string)(*User, error){
-	for i := range u.userList{
-		if email == u.userList[i].Email && pass == u.userList[i].Password{
-			return u.userList[i],nil
-		}
+// constructor
+func NewUserList(db *sqlx.DB) UserInterface {
+	return &userListSruct{
+		db: db,
 	}
-	return nil,nil
 }
 
-func (u *userListSruct)List()([]*User,error){
-	return u.userList,nil
-}
+func (u *userListSruct) Create(usr *User) (*User, error) {
+	query := `
+		INSERT INTO users (
+		first_name,
+		email, 
+		password, 
+		is_shop_owner
+		)
 
-func (u *userListSruct)Delete(id int)  error{
-	var temp_list []*User
-	for i := range u.userList{
-		if id != u.userList[i].ID{
-			temp_list = append(temp_list, u.userList[i])
-		}
+		VALUES (
+		:first_name, 
+		:email, 
+		:password, 
+		:is_shop_owner
+		)
+		RETURNING id
+	`
+
+	var userId int
+	rows, err := u.db.NamedQuery(query, usr)
+
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
 	}
-	u.userList = temp_list
-	return nil
+
+	if rows.Next() {
+		rows.Scan(&userId)
+	}
+	usr.ID = userId
+	return usr, nil
 }
 
-func (u *userListSruct)Update(usr User)(*User, error){
-	for i := range u.userList{
-		if usr.ID == u.userList[i].ID{
-			u.userList[i] = &usr
-			return u.userList[i],nil
+func (u *userListSruct) GetUser(email, pass string) (*User, error) {
+	query := `
+		SELECT id, first_name, email, password, is_shop_owner
+		FROM users
+		WHERE email = $1 AND password = $2
+		LIMIT 1
+	`
+
+	var user User
+	err := u.db.Get(&user, query, email, pass)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
 		}
+		return nil, err
 	}
-	return nil,nil
+
+	return &user, nil
 }
+
+// func (u *userListSruct) List() ([]*User, error) {
+// 	return u.userList, nil
+// }
+
+// func (u *userListSruct) Delete(id int) error {
+// 	var temp_list []*User
+// 	for i := range u.userList {
+// 		if id != u.userList[i].ID {
+// 			temp_list = append(temp_list, u.userList[i])
+// 		}
+// 	}
+// 	u.userList = temp_list
+// 	return nil
+// }
+
+// func (u *userListSruct) Update(usr User) (*User, error) {
+// 	for i := range u.userList {
+// 		if usr.ID == u.userList[i].ID {
+// 			u.userList[i] = &usr
+// 			return u.userList[i], nil
+// 		}
+// 	}
+// 	return nil, nil
+// }
