@@ -2,25 +2,15 @@ package repo
 
 import (
 	"database/sql"
+	"eccomerce/domain"
+	"eccomerce/user"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type User struct {
-	ID          int    `json:"id" db:"id"`
-	FirstName   string `json:"first_name" db:"first_name"`
-	Email       string `json:"email" db:"email"`
-	Password    string `json:"password" db:"password"`
-	IsShopOwner bool   `json:"is_shop_owner" db:"is_shop_owner"`
-}
-
 type UserInterface interface {
-	Create(usr *User) (*User, error)
-	GetUser(email, pass string) (*User, error)
-	// List() ([]*User, error)
-	// Delete(id int) error
-	// Update(usr User) (*User, error)
+	user.UserInterface
 }
 
 type userListSruct struct {
@@ -34,7 +24,7 @@ func NewUserList(db *sqlx.DB) UserInterface {
 	}
 }
 
-func (u *userListSruct) Create(usr *User) (*User, error) {
+func (u *userListSruct) Create(usr *domain.User) (*domain.User, error) {
 	query := `
 		INSERT INTO users (
 		first_name,
@@ -67,7 +57,7 @@ func (u *userListSruct) Create(usr *User) (*User, error) {
 	return usr, nil
 }
 
-func (u *userListSruct) GetUser(email, pass string) (*User, error) {
+func (u *userListSruct) GetUser(email, pass string) (*domain.User, error) {
 	query := `
 		SELECT id, first_name, email, password, is_shop_owner
 		FROM users
@@ -75,7 +65,7 @@ func (u *userListSruct) GetUser(email, pass string) (*User, error) {
 		LIMIT 1
 	`
 
-	var user User
+	var user domain.User
 	err := u.db.Get(&user, query, email, pass)
 	if err != nil {
 		if err == sql.ErrNoRows {

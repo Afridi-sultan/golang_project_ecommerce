@@ -2,7 +2,6 @@ package product
 
 import (
 	
-	"eccomerce/util"
 	"net/http"
 	"strconv"
 )
@@ -20,17 +19,14 @@ func (h *Handler) DelProductByid(w http.ResponseWriter, r *http.Request) {
 	err2 := h.productRepo.Delete(pID)
 
 	if err2 !=nil {
-		http.Error(w, "Id not found", http.StatusNotFound)
+		if err2.Error() == "product not found"{
+			http.Error(w, "Product not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	productList,err := h.productRepo.List()
-
-	if err != nil{
-		http.Error(w,"internel server error",http.StatusBadRequest)
-		return
-	}
-
-	util.SendData(w,&productList, 200)
+	w.WriteHeader(http.StatusNoContent)
 
 }
