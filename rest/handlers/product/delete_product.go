@@ -16,7 +16,7 @@ func (h *Handler) DelProductByid(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err2 := h.productRepo.Delete(pID)
+	err2 := h.svc.Delete(pID)
 
 	if err2 !=nil {
 		if err2.Error() == "product not found"{

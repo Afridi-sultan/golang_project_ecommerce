@@ -8,7 +8,7 @@ import (
 
 // route function | product route
 func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
-	productList,err := h.productRepo.List()
+	productList,err := h.svc.List()
 	if err != nil{
 		http.Error(w,"Internel Server Error",http.StatusBadRequest)
 		return

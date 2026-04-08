@@ -2,25 +2,15 @@ package repo
 
 import (
 	"database/sql"
+	"eccomerce/domain"
+	"eccomerce/product"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type Products struct {
-	ID          int     `json:"id" db:"id"`
-	Title       string  `json:"title" db:"title"`
-	Description string  `json:"description" db:"description"`
-	Price       float64 `json:"price" db:"price"`
-	ImgUrl      string  `json:"imgUrl" db:"img_url"`
-}
-
 type ProductRepo interface {
-	Create(p Products) (*Products, error)
-	Get(productId int) (*Products, error)
-	List() ([]*Products, error)
-	Delete(id int) error
-	Update(p Products) (*Products, error)
+	product.ProductRepo
 }
 
 type productRepo struct {
@@ -36,7 +26,7 @@ func NewProductRepo(db *sqlx.DB) ProductRepo {
 }
 
 // Methods
-func (r *productRepo) Create(p Products) (*Products, error) {
+func (r *productRepo) Create(p domain.Products) (*domain.Products, error) {
 	query := `
 	INSERT INTO products (title, description, price, img_url)
 	VALUES ($1, $2, $3, $4)
@@ -50,8 +40,8 @@ func (r *productRepo) Create(p Products) (*Products, error) {
 	return &p, nil
 }
 
-func (r *productRepo) Get(id int) (*Products, error) {
-	var prdt Products
+func (r *productRepo) Get(id int) (*domain.Products, error) {
+	var prdt domain.Products
 
 	query := `
 	SELECT id, title, description, price, img_url
@@ -69,8 +59,8 @@ func (r *productRepo) Get(id int) (*Products, error) {
 	return &prdt, nil
 }
 
-func (r *productRepo) List() ([]*Products, error) {
-	var productList []*Products
+func (r *productRepo) List() ([]*domain.Products, error) {
+	var productList []*domain.Products
 
 	query := `
 	SELECT id, title, description, price, img_url
@@ -93,7 +83,7 @@ func (r *productRepo) Delete(id int) error {
 	result, err := r.db.Exec(query, id)
 	if err != nil {
 		return err
-		
+
 	}
 
 	rows, err := result.RowsAffected()
@@ -108,7 +98,7 @@ func (r *productRepo) Delete(id int) error {
 	return nil
 }
 
-func (r *productRepo) Update(p Products) (*Products, error) {
+func (r *productRepo) Update(p domain.Products) (*domain.Products, error) {
 	query := `
 	UPDATE products
 	SET 

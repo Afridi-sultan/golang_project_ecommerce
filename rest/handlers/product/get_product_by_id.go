@@ -18,7 +18,7 @@ func (h *Handler) GetProductByid(w http.ResponseWriter, r *http.Request){
 	}
 
 	
-	product, err := h.productRepo.Get(pID)
+	product, err := h.svc.Get(pID)
 	if err != nil{
 		http.Error(w,"Internal server error",http.StatusBadRequest)
 		return

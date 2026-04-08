@@ -3,14 +3,15 @@ package cmd
 import (
 	"eccomerce/config"
 	"eccomerce/infra/db"
+	"eccomerce/product"
 	"eccomerce/repo"
 	"eccomerce/rest"
-	"eccomerce/rest/handlers/product"
+	productHandler "eccomerce/rest/handlers/product"
 	userHandler "eccomerce/rest/handlers/user"
+	"eccomerce/user"
 	"fmt"
 	"log"
 	"os"
-	"eccomerce/user"
 )
 
 func Serve() {
@@ -24,9 +25,9 @@ func Serve() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	errMIg := db.MigrateDB(dbcon,"./migrations")
+	errMIg := db.MigrateDB(dbcon, "./migrations")
 	if errMIg != nil {
-		log.Fatal("Failed to migrate database",errMIg)
+		log.Fatal("Failed to migrate database", errMIg)
 		os.Exit(1)
 	}
 	//repository
@@ -34,9 +35,9 @@ func Serve() {
 	userRepo := repo.NewUserList(dbcon)
 	//Domains
 	usrSvc := user.NewService(userRepo)
-
+	prdctSvc := product.NewService(productRepo)
 	//handlers
-	productHandler := product.NewHandler(productRepo)
+	productHandler := productHandler.NewHandler(prdctSvc)
 	userHandler := userHandler.NewHandler(usrSvc)
 	server := rest.NewServer(productHandler, userHandler)
 	server.Start()

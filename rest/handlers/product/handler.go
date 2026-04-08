@@ -1,13 +1,13 @@
 package product
 
-import "eccomerce/repo"
+
 
 type Handler struct {
-	productRepo repo.ProductRepo
+	svc 	  Service
 }
 
-func NewHandler(productRepo repo.ProductRepo) *Handler {
+func NewHandler(svc Service) *Handler {
 	return &Handler{
-		productRepo: productRepo,
+		svc: svc,
 	}
 }
