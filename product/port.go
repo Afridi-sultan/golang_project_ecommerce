@@ -8,9 +8,10 @@ import (
 type ProductRepo interface {
 	Create(p domain.Products) (*domain.Products, error)
 	Get(productId int) (*domain.Products, error)
-	List() ([]*domain.Products, error)
+	List(page, limit int64) ([]*domain.Products, error)
 	Delete(id int) error
 	Update(p domain.Products) (*domain.Products, error)
+	Count() (int64, error)
 }
 
 type Service interface {

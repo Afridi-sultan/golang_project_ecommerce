@@ -21,8 +21,8 @@ func (s *service) Get(productId int) (*domain.Products, error) {
 	return s.ProductRepo.Get(productId)
 }	
 
-func (s *service) List() ([]*domain.Products, error) {
-	return s.ProductRepo.List()
+func (s *service) List(page, limit int64) ([]*domain.Products, error) {
+	return s.ProductRepo.List(page, limit)
 }	
 
 func (s *service) Delete(id int) error {
@@ -31,4 +31,8 @@ func (s *service) Delete(id int) error {
 
 func (s *service) Update(p domain.Products) (*domain.Products, error) {
 	return s.ProductRepo.Update(p)
+}
+
+func (s *service) Count() (int64, error) {
+	return s.ProductRepo.Count()
 }

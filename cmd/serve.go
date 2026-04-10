@@ -15,6 +15,7 @@ import (
 )
 
 func Serve() {
+	// Load DB config
 	dbcnf := config.DBstringLoad()
 	if dbcnf == nil {
 		log.Fatal("Failed to load DB config")
@@ -25,20 +26,27 @@ func Serve() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	// Migrate the database
 	errMIg := db.MigrateDB(dbcon, "./migrations")
 	if errMIg != nil {
 		log.Fatal("Failed to migrate database", errMIg)
 		os.Exit(1)
 	}
+
 	//repository
 	productRepo := repo.NewProductRepo(dbcon)
 	userRepo := repo.NewUserList(dbcon)
-	//Domains
+
+	//services
 	usrSvc := user.NewService(userRepo)
 	prdctSvc := product.NewService(productRepo)
+
 	//handlers
 	productHandler := productHandler.NewHandler(prdctSvc)
 	userHandler := userHandler.NewHandler(usrSvc)
+	
+	//server
 	server := rest.NewServer(productHandler, userHandler)
 	server.Start()
 
