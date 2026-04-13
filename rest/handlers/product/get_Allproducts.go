@@ -9,6 +9,7 @@ import (
 )
 
 var countMain int64
+var mu sync.Mutex
 
 // route function | product route
 func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +38,10 @@ func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+
+		mu.Lock()
+		defer mu.Unlock()
+
 		count, err := h.svc.Count()
 		countMain = count
 		if err != nil {
@@ -49,6 +54,9 @@ func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		mu.Lock()
+		defer mu.Unlock()
+
 		count1, err := h.svc.Count()
 		countMain = count1
 		if err != nil {
@@ -61,6 +69,9 @@ func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+
+		mu.Lock()
+		defer mu.Unlock()
 		count2, err := h.svc.Count()
 		countMain = count2
 
