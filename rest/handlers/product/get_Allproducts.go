@@ -1,6 +1,7 @@
 package product
 
 import (
+	"eccomerce/domain"
 	"eccomerce/util"
 	"net/http"
 	"strconv"
@@ -26,64 +27,31 @@ func (h *Handler) ProductHandler(w http.ResponseWriter, r *http.Request) {
 		limitNum = 10
 	}
 
-	productList, err := h.svc.List(pageNum, limitNum)
-	if err != nil {
-		http.Error(w, "Internel Server Error", http.StatusBadRequest)
-		return
-	}
-
-	var wg sync.WaitGroup
-
-	//just for testing purpose
-	wg.Add(1)
+	productCh := make(chan []*domain.Products, 1) // Create a buffered channel with capacity 1
 	go func() {
-		defer wg.Done()
+		productList, err := h.svc.List(pageNum, limitNum)
+		productCh <- productList // Send the productList to the channel
+			if err != nil {
+			http.Error(w, "Internel Server Error", http.StatusBadRequest)
+			return
+		}
 
-		mu.Lock()
-		defer mu.Unlock()
+	}()
 
+	ch := make(chan int64, 1) // Create a buffered channel with capacity 1
+
+	go func() {
 		count, err := h.svc.Count()
-		countMain = count
+		ch <- count // Send the count to the channel
 		if err != nil {
 			http.Error(w, "Internel Server Error", http.StatusBadRequest)
 			return
 		}
-		
+
 	}()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		mu.Lock()
-		defer mu.Unlock()
-
-		count1, err := h.svc.Count()
-		countMain = count1
-		if err != nil {
-			http.Error(w, "Internel Server Error", http.StatusBadRequest)
-			return
-		}
-		
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		mu.Lock()
-		defer mu.Unlock()
-		count2, err := h.svc.Count()
-		countMain = count2
-
-		if err != nil {
-			http.Error(w, "Internel Server Error", http.StatusBadRequest)
-			return
-		}
-		
-	}()
-	
-	wg.Wait()
-	//just for testing purpose
+	countMain := <-ch // Receive the count from the channel
+	productList := <-ch // Receive the productList from the channel
 
 	util.SendPaginatedData(w, &productList, pageNum, limitNum, countMain)
 
